@@ -1,6 +1,4 @@
 # BAUST-Routine-and-Room-Management-System-2.0
-# BAUST Routine and Room Management System 2.0
-
 A comprehensive web-based solution designed for **Bangladesh Army University of Science and Technology (BAUST)** to streamline the process of academic routine creation and classroom allocation.
 
 ## 📌 Project Overview
