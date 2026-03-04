@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Profile | BAUST</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --baust-primary: #003366; /* BAUST Official Deep Blue */
+            --baust-secondary: #005A31; /* BAUST Official Green */
+            --background-light: #f4f7f6;
+            --text-dark: #343a40;
+            --text-light: #f8f9fa;
+            --border-color: #e9ecef;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            font-size: 16px;
+        }
+
+        #wrapper {
+            display: flex;
+            transition: padding-left 0.3s ease;
+        }
+
+        #sidebar-wrapper {
+            min-height: 100vh;
+            width: var(--sidebar-width);
+            margin-left: 0;
+            background-color: var(--baust-primary);
+            color: var(--text-light);
+            transition: margin 0.3s ease-out;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex; /* Added for correct sidebar footer position */
+            flex-direction: column; /* Added for correct sidebar footer position */
+        }
+
+        #wrapper.toggled #sidebar-wrapper {
+            margin-left: calc(-1 * var(--sidebar-width));
+        }
+
+        .sidebar-heading {
+            background-color: #002244;
+            padding: 1.25rem 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+        }
+        
+        .sidebar-heading span {
+            font-size: 1.1rem;
+        }
+        
+        .list-group {
+            flex-grow: 1;
+        }
+
+        .list-group-item {
+            background-color: transparent !important;
+            border: none !important;
+            color: rgba(255, 255, 255, 0.8) !important;
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+            font-size: 0.95rem;
+        }
+
+        .list-group-item:hover, .list-group-item.active {
+            background-color: var(--baust-secondary) !important;
+            color: white !important;
+            border-left-color: #ffc107;
+            transform: translateX(5px);
+        }
+        
+        .list-group-item i {
+            width: 25px;
+            margin-right: 5px;
+        }
+        
+        /* NEW: Sidebar Footer (from routine_management.html) */
+        .sidebar-footer {
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: auto;
+        }
+        
+        .sidebar-footer .admin-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .sidebar-footer .admin-role {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        #page-content-wrapper {
+            width: 100%;
+            padding-left: var(--sidebar-width);
+            transition: padding-left 0.3s ease-out;
+        }
+        
+        #wrapper.toggled #page-content-wrapper {
+            padding-left: 0;
+        }
+
+        /* NEW: Navbar (from routine_management.html) */
+        .navbar {
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 1rem 2rem;
+            height: 80px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-content {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        #menu-toggle {
+            color: var(--baust-primary);
+            cursor: pointer;
+            font-size: 1.5rem;
+            margin-right: 20px;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background-color: var(--baust-primary);
+            color: white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-right: 12px;
+        }
+        
+        .user-info .user-name {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 1rem;
+        }
+        
+        .user-info .user-role {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .dropdown-menu {
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .content-wrapper {
+            padding: 30px;
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .profile-card {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .profile-avatar {
+            width: 140px;
+            height: 140px;
+            background-color: var(--baust-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            box-shadow: 0 10px 30px rgba(0, 51, 102, 0.2);
+            color: white;
+            font-size: 4rem; /* Changed to match CSS block below */
+        }
+        
+        /* Removed duplicate .profile-avatar i */
+
+        .profile-header h2 {
+            color: var(--baust-primary);
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .profile-header p {
+            color: #6c757d;
+            font-size: 1.2rem;
+        }
+
+        .info-group {
+            margin-bottom: 25px;
+        }
+
+        .info-label {
+            color: #6c757d;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .info-label i {
+            color: var(--baust-secondary);
+        }
+
+        .info-value {
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            font-weight: 600;
+            background-color: var(--background-light);
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-back {
+            background-color: var(--baust-secondary);
+            border: none;
+            color: white;
+            padding: 12px 35px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-back:hover {
+            background-color: var(--baust-primary);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 51, 102, 0.2);
+        }
+
+        @media (max-width: 992px) {
+            #sidebar-wrapper {
+                margin-left: calc(-1 * var(--sidebar-width));
+            }
+            
+            #wrapper.toggled #sidebar-wrapper {
+                margin-left: 0;
+            }
+
+            #page-content-wrapper {
+                padding-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="sidebar-wrapper">
+            <div class="sidebar-heading">
+                <img src="baust_logo.png" alt="BAUST Logo" class="logo-icon">
+                <span>BAUST Routine</span>
+            </div>
+            <div class="list-group list-group-flush my-3">
+                <a href="admin_dashboard.html" class="list-group-item">
+                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                </a>
+                <a href="routine_management.html" class="list-group-item">
+                    <i class="fas fa-calendar-plus me-2"></i>Routine Builder
+                </a>
+                <a href="view_routines.html" class="list-group-item">
+                    <i class="fas fa-eye me-2"></i>View Routines
+                </a>
+                <a href="resource_management.html" class="list-group-item">
+                    <i class="fas fa-cogs me-2"></i>Manage Resources
+                </a>
+                <a href="reports.html" class="list-group-item">
+                    <i class="fas fa-chart-line me-2"></i>Reports
+                </a>
+            </div>
+            <div class="sidebar-footer">
+                <div class="admin-name">Loading...</div>
+                <div class="admin-role">Loading...</div>
+            </div>
+        </div>
+
+        <div id="page-content-wrapper">
+            <nav class="navbar">
+                <div class="navbar-content">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-align-left" id="menu-toggle"></i>
+                        <h2 class="fs-2 m-0 ms-3">Admin Profile</h2>
+                    </div>
+                    <div class="dropdown user-profile">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="user-avatar">A</div>
+                            <div class="user-info d-none d-md-block">
+                                <div class="user-name">Loading...</div>
+                                <div class="user-role">System Administrator</div>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="admin_profile.html"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="admin_settings.html"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="login.html"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="content-wrapper">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h2 id="profile-full-name">Loading Full Name...</h2>
+                        <p id="profile-role">Loading Role...</p>
+                    </div>
+
+                    <div class="info-group">
+                        <div class="info-label">
+                            <i class="fas fa-user"></i>
+                            Username
+                        </div>
+                        <div class="info-value" id="info-username">Loading...</div>
+                    </div>
+
+                    <div class="info-group">
+                        <div class="info-label">
+                            <i class="fas fa-envelope"></i>
+                            Email
+                        </div>
+                        <div class="info-value" id="info-email">Loading...</div>
+                    </div>
+
+                    <div class="info-group">
+                        <div class="info-label">
+                            <i class="fas fa-shield-alt"></i>
+                            Role
+                        </div>
+                        <div class="info-value" id="info-role-value">Loading...</div>
+                    </div>
+
+                    <div class="info-group">
+                        <div class="info-label">
+                            <i class="fas fa-building"></i>
+                            Department
+                        </div>
+                        <div class="info-value" id="info-department">Loading...</div>
+                    </div>
+
+                    <div class="text-center mt-5">
+                        <a href="admin_dashboard.html" class="btn-back">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_URL = 'http://127.0.0.1:8000/api';
+        
+        var el = document.getElementById("wrapper");
+        var toggleButton = document.getElementById("menu-toggle");
+        
+        toggleButton.onclick = function () {
+            el.classList.toggle("toggled");
+        };
+
+        // --- Data Loading Logic ---
+        async function loadProfileData() {
+            const username = localStorage.getItem('username');
+            
+            // 1. Update UI with local storage info immediately
+            if (username) {
+                document.querySelectorAll('.user-name, .admin-name').forEach(el => el.textContent = username);
+                document.querySelectorAll('.user-avatar').forEach(el => el.textContent = username.charAt(0).toUpperCase());
+                document.getElementById('info-username').textContent = username;
+            } else {
+                // If no username, user is likely not logged in
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                // FIX: API structure to search users by username (assuming you implemented this view)
+                // If a UserViewSet exists, we can filter it. We'll use a direct filter approach.
+                const userRes = await fetch(`${API_URL}/users/?username=${username}`);
+                const userData = await userRes.json();
+                
+                if (userRes.ok && userData.length > 0) {
+                    const user = userData[0]; // Take the first result
+                    
+                    // 2. Load Department Data (if department_id is available)
+                    let deptName = user.department_id ? 'Loading...' : 'N/A';
+                    if (user.department_id) {
+                         const deptRes = await fetch(`${API_URL}/departments/${user.department_id}/`);
+                         const deptData = await deptRes.json();
+                         if (deptRes.ok) {
+                             deptName = deptData.name;
+                         }
+                    }
+
+                    // 3. Update Profile Cards with DB data
+                    document.getElementById('profile-full-name').textContent = user.full_name;
+                    document.getElementById('profile-role').textContent = user.role.toUpperCase() || 'System Administrator';
+                    document.getElementById('info-role-value').textContent = user.role.toUpperCase() || 'System Administrator';
+                    document.getElementById('info-email').textContent = user.email;
+                    document.getElementById('info-department').textContent = deptName;
+                } else {
+                    console.error('User data not found via API.');
+                    document.getElementById('profile-full-name').textContent = 'Error: User Not Found';
+                }
+
+            } catch (error) {
+                console.error('Network Error fetching user data:', error);
+                document.getElementById('profile-full-name').textContent = 'System Administrator'; // Default fallback
+                document.getElementById('info-department').textContent = 'N/A (API Down)';
+            }
+        }
+        
+        // --- Logout Functionality (copied from previous files) ---
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('username');
+            window.location.href = 'login.html';
+        }
+
+        document.querySelectorAll('a[href="login.html"]').forEach(link => {
+            if (link.textContent.includes('Logout')) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    logout();
+                });
+            }
+        });
+
+        // Initialize
+        window.onload = function() {
+            if (window.innerWidth < 992) {
+                el.classList.add("toggled");
+            }
+            loadProfileData();
+        };
+    </script>
+</body>
+</html>

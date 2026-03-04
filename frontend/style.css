@@ -1,0 +1,116 @@
+:root {
+  --main-bg-color: #f8f9fa;
+  --sidebar-bg-color: #2c3e50;
+  --primary-text-color: #007bff;
+  --secondary-bg-color: rgba(0, 123, 255, 0.1);
+}
+
+body {
+    background-color: var(--main-bg-color);
+    overflow-x: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+#wrapper {
+    display: flex;
+}
+
+#sidebar-wrapper {
+    min-height: 100vh;
+    margin-left: -15rem;
+    transition: margin 0.3s ease-in-out;
+    background-color: var(--sidebar-bg-color) !important;
+}
+
+#sidebar-wrapper .sidebar-heading {
+    padding: 0.875rem 1.25rem;
+    font-size: 1.2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#sidebar-wrapper .list-group {
+    width: 15rem;
+}
+
+#page-content-wrapper {
+    min-width: 100vw;
+    transition: margin 0.3s ease-in-out;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    margin-left: 0;
+}
+
+@media (min-width: 768px) {
+    #sidebar-wrapper {
+        margin-left: 0;
+    }
+    #page-content-wrapper {
+        min-width: 0;
+        width: 100%;
+    }
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: -15rem;
+    }
+}
+
+.primary-text {
+    color: var(--primary-text-color);
+}
+
+.secondary-bg {
+    background-color: var(--secondary-bg-color);
+}
+
+.rounded-lg {
+    border-radius: 0.5rem !important;
+}
+
+.rounded-full {
+    border-radius: 50% !important;
+}
+
+.list-group-item.active {
+    background-color: #34495e !important;
+    border-color: #34495e !important;
+    color: #fff !important;
+    border-left: 4px solid var(--primary-text-color) !important;
+}
+
+.animated-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.animated-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+}
+
+.animated-btn {
+    transition: all 0.3s ease;
+}
+.animated-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.animated-link {
+    transition: all 0.3s ease;
+}
+.animated-link:hover {
+    color: var(--primary-text-color) !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.card-title i {
+    color: var(--primary-text-color);
+}
+
+/* New Styles for Form and Table */
+.form-section {
+    max-width: 700px;
+    margin: auto;
+}
+.form-check-input:checked {
+    background-color: var(--primary-text-color);
+    border-color: var(--primary-text-color);
+}

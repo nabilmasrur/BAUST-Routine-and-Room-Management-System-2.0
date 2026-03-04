@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Settings | BAUST</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --baust-primary: #003366; /* BAUST Official Deep Blue */
+            --baust-secondary: #005A31; /* BAUST Official Green */
+            --background-light: #f4f7f6;
+            --text-dark: #343a40;
+            --text-light: #f8f9fa;
+            --border-color: #e9ecef;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            font-size: 16px;
+        }
+
+        #wrapper {
+            display: flex;
+            transition: padding-left 0.3s ease;
+        }
+
+        #sidebar-wrapper {
+            min-height: 100vh;
+            width: var(--sidebar-width);
+            margin-left: 0;
+            background-color: var(--baust-primary);
+            color: var(--text-light);
+            transition: margin 0.3s ease-out;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #wrapper.toggled #sidebar-wrapper {
+            margin-left: calc(-1 * var(--sidebar-width));
+        }
+
+        .sidebar-heading {
+            background-color: #002244;
+            padding: 1.25rem 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+        }
+        
+        .sidebar-heading span {
+            font-size: 1.1rem;
+        }
+        
+        .list-group {
+            flex-grow: 1;
+        }
+
+        .list-group-item {
+            background-color: transparent !important;
+            border: none !important;
+            color: rgba(255, 255, 255, 0.8) !important;
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+            font-size: 0.95rem;
+        }
+
+        .list-group-item:hover, .list-group-item.active {
+            background-color: var(--baust-secondary) !important;
+            color: white !important;
+            border-left-color: #ffc107;
+            transform: translateX(5px);
+        }
+        
+        .list-group-item i {
+            width: 25px;
+            margin-right: 5px;
+        }
+        
+        /* FIX: Sidebar Footer Style */
+        .sidebar-footer {
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: auto;
+        }
+        
+        .sidebar-footer .admin-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .sidebar-footer .admin-role {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+
+        #page-content-wrapper {
+            width: 100%;
+            padding-left: var(--sidebar-width);
+            transition: padding-left 0.3s ease-out;
+        }
+        
+        #wrapper.toggled #page-content-wrapper {
+            padding-left: 0;
+        }
+
+        /* FIX: Navbar Style */
+        .navbar {
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 1rem 2rem;
+            height: 80px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-content {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: space-between;
+        }
+        
+        #menu-toggle {
+            color: var(--baust-primary);
+            cursor: pointer;
+            font-size: 1.5rem;
+            margin-right: 20px;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background-color: var(--baust-primary);
+            color: white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-right: 12px;
+        }
+        
+        .user-info .user-name {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 1rem;
+        }
+        
+        .user-info .user-role {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .dropdown-menu {
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .content-wrapper {
+            padding: 30px;
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .settings-card {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .settings-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .settings-header h2 {
+            color: var(--baust-primary);
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .settings-header p {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            color: var(--text-dark);
+            font-size: 1rem;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            padding: 12px 18px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .form-control:focus {
+            border-color: var(--baust-secondary);
+            box-shadow: 0 0 0 0.25rem rgba(0, 90, 49, 0.2);
+        }
+
+        .btn-save {
+            background-color: var(--baust-secondary);
+            border: none;
+            color: white;
+            padding: 12px 35px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save:hover {
+            background-color: var(--baust-primary);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 51, 102, 0.2);
+        }
+        
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+            padding: 12px 35px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .btn-back:hover {
+            background-color: #5a6268;
+        }
+
+        /* FIX: Alert style correction */
+        .alert-success, .alert-danger {
+            display: none;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="sidebar-wrapper">
+            <div class="sidebar-heading">
+                <img src="baust_logo.png" alt="BAUST Logo" class="logo-icon">
+                <span>BAUST Routine</span>
+            </div>
+            <div class="list-group list-group-flush my-3">
+                <a href="admin_dashboard.html" class="list-group-item">
+                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                </a>
+                <a href="routine_management.html" class="list-group-item">
+                    <i class="fas fa-calendar-plus me-2"></i>Routine Builder
+                </a>
+                <a href="view_routines.html" class="list-group-item">
+                    <i class="fas fa-eye me-2"></i>View Routines
+                </a>
+                <a href="resource_management.html" class="list-group-item">
+                    <i class="fas fa-cogs me-2"></i>Manage Resources
+                </a>
+                <a href="reports.html" class="list-group-item">
+                    <i class="fas fa-chart-line me-2"></i>Reports
+                </a>
+                <a href="#" class="list-group-item" data-bs-toggle="modal" data-bs-target="#passwordModal">
+                    <i class="fas fa-users-cog me-2"></i>User Management
+                </a>
+                <a href="#" class="list-group-item" data-bs-toggle="modal" data-bs-target="#aboutModal">
+                    <i class="fas fa-info-circle me-2"></i>About
+                </a>
+            </div>
+            <div class="sidebar-footer">
+                <div class="admin-name">Loading...</div>
+                <div class="admin-role">System Administrator</div>
+            </div>
+        </div>
+
+        <div id="page-content-wrapper">
+            <nav class="navbar">
+                <div class="navbar-content">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-align-left" id="menu-toggle"></i>
+                        <h2 class="fs-2 m-0 ms-3">Settings</h2>
+                    </div>
+                    <div class="dropdown user-profile">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="user-avatar">A</div>
+                            <div class="user-info d-none d-md-block">
+                                <div class="user-name">Loading...</div>
+                                <div class="user-role">System Administrator</div>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="admin_profile.html"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="admin_settings.html"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="login.html"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="content-wrapper">
+                <div class="settings-card">
+                    <div class="settings-header">
+                        <h2><i class="fas fa-cog me-2"></i>Account Settings</h2>
+                        <p>Manage your login credentials and personal information</p>
+                    </div>
+
+                    <div id="alert-message" class="alert"></div>
+
+                    <form id="settings-form" onsubmit="return saveSettings(event)">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-envelope me-2 text-secondary"></i>
+                                Email Address
+                            </label>
+                            <input type="email" class="form-control" id="email-input" placeholder="Enter email">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-lock me-2 text-secondary"></i>
+                                Current Password
+                            </label>
+                            <input type="password" class="form-control" id="current-password" placeholder="Enter current password">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-key me-2 text-secondary"></i>
+                                New Password
+                            </label>
+                            <input type="password" class="form-control" id="new-password" placeholder="Enter new password">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-check-circle me-2 text-secondary"></i>
+                                Confirm New Password
+                            </label>
+                            <input type="password" class="form-control" id="confirm-new-password" placeholder="Confirm new password">
+                        </div>
+
+                        <div class="d-flex gap-3 justify-content-end mt-5">
+                            <a href="admin_dashboard.html" class="btn btn-back">
+                                <i class="fas fa-times me-2"></i>
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-save">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_URL = 'http://127.0.0.1:8000/api';
+        let currentUserId = null;
+        let currentUsername = null; 
+
+        var el = document.getElementById("wrapper");
+        var toggleButton = document.getElementById("menu-toggle");
+        
+        toggleButton.onclick = function () {
+            el.classList.toggle("toggled");
+        };
+        
+        // --- Utility to Show Alerts ---
+        function showAlert(type, message) {
+            const alertDiv = document.getElementById('alert-message');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'times-circle'} me-2"></i> ${message}`;
+            alertDiv.style.display = 'block';
+            setTimeout(() => { alertDiv.style.display = 'none'; }, 5000);
+        }
+
+
+        // --- Data Loading Logic ---
+        async function loadSettingsData() {
+            const username = localStorage.getItem('username');
+            
+            if (!username) {
+                // If not logged in, redirect
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // 1. Update UI with local storage info immediately
+            currentUsername = username;
+            document.querySelectorAll('.user-name, .admin-name').forEach(el => el.textContent = username);
+            document.querySelectorAll('.user-avatar').forEach(el => el.textContent = username.charAt(0).toUpperCase());
+            
+            // 2. Fetch user data by username
+            try {
+                // FIX: Assuming the backend provides a filtered list by username
+                const userRes = await fetch(`${API_URL}/users/?username=${username}`);
+                const userData = await userRes.json();
+                
+                if (userRes.ok && userData.length > 0) {
+                    const user = userData[0];
+                    currentUserId = user.id;
+
+                    // 3. Populate form fields with fetched data
+                    document.getElementById('email-input').value = user.email || '';
+                    document.querySelector('.sidebar-footer .admin-role').textContent = user.role.toUpperCase() || 'Administrator';
+                } else {
+                    console.error('User data not found via API.');
+                    document.querySelector('.sidebar-footer .admin-name').textContent = 'Admin User';
+                    showAlert('danger', 'Error fetching user details from API.');
+                }
+
+            } catch (error) {
+                console.error('Network Error fetching user data:', error);
+                showAlert('danger', 'Network Error. Could not load profile details.');
+            }
+        }
+        
+        // --- Form Saving Logic ---
+        async function saveSettings(event) {
+            event.preventDefault();
+            
+            const currentPassword = document.getElementById('current-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-new-password').value;
+            const newEmail = document.getElementById('email-input').value;
+            
+            // Validation
+            if (newPassword && newPassword !== confirmPassword) {
+                showAlert('danger', 'New passwords do not match.');
+                return false;
+            }
+            
+            if (!currentUserId) {
+                showAlert('danger', 'Error: User ID not available for update.');
+                return false;
+            }
+
+            const payload = { 
+                email: newEmail,
+                // Only send password fields if a new password is provided
+                ...(newPassword ? { current_password: currentPassword, new_password: newPassword } : {})
+            };
+            
+            if (newPassword && !currentPassword) {
+                 showAlert('danger', 'You must enter your current password to change it.');
+                 return false;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/users/${currentUserId}/`, {
+                    method: 'PATCH', // Use PATCH for partial updates (email or password)
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showAlert('success', 'Settings saved successfully!');
+                    
+                    // Clear password fields on successful update
+                    document.getElementById('current-password').value = '';
+                    document.getElementById('new-password').value = '';
+                    document.getElementById('confirm-new-password').value = '';
+
+                } else {
+                    // Show specific error from Django (e.g., wrong current password)
+                    const errorMessage = result.current_password ? "Invalid current password provided." : (result.email ? "Email already exists." : (result.detail || 'Failed to save changes.'));
+                    showAlert('danger', `Failed: ${errorMessage}`);
+                }
+            } catch (error) {
+                showAlert('danger', 'Network error. Could not connect to API.');
+            }
+            
+            return false;
+        }
+
+        
+        // --- Logout Functionality (copied from previous files) ---
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('username');
+            window.location.href = 'login.html';
+        }
+
+        document.querySelectorAll('a[href="login.html"]').forEach(link => {
+            if (link.textContent.includes('Logout')) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    logout();
+                });
+            }
+        });
+
+        // Initialize
+        window.onload = function() {
+            if (window.innerWidth < 992) {
+                el.classList.add("toggled");
+            }
+            loadSettingsData();
+        };
+    </script>
+</body>
+</html>

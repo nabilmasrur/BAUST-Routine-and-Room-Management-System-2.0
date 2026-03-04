@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management | BAUST</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --baust-primary: #003366;
+            --baust-secondary: #005A31;
+            --background-light: #f4f7f6;
+            --text-dark: #343a40;
+            --text-light: #f8f9fa;
+            --border-color: #e9ecef;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            font-size: 16px;
+        }
+
+        #wrapper {
+            display: flex;
+        }
+
+        #sidebar-wrapper {
+            min-height: 100vh;
+            width: var(--sidebar-width);
+            margin-left: 0;
+            background-color: var(--baust-primary);
+            color: var(--text-light);
+            transition: margin 0.3s ease-out;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #wrapper.toggled #sidebar-wrapper {
+            margin-left: calc(-1 * var(--sidebar-width));
+        }
+
+        .sidebar-brand {
+            background-color: #002244;
+            padding: 1.25rem 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+        }
+        
+        .sidebar-brand-text {
+            font-size: 1.1rem;
+        }
+
+        .list-group {
+            flex-grow: 1;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-footer .admin-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .sidebar-footer .admin-role {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .list-group-item {
+            background-color: transparent !important;
+            border: none !important;
+            color: rgba(255, 255, 255, 0.8) !important;
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+            font-size: 0.95rem;
+        }
+
+        .list-group-item:hover, .list-group-item.active {
+            background-color: var(--baust-secondary) !important;
+            color: white !important;
+            border-left-color: #ffc107;
+            transform: translateX(5px);
+        }
+        
+        .list-group-item i {
+            width: 25px;
+            margin-right: 5px;
+        }
+
+        #page-content-wrapper {
+            width: 100%;
+            padding-left: var(--sidebar-width);
+            transition: padding-left 0.3s ease-out;
+        }
+        
+        #wrapper.toggled #page-content-wrapper {
+            padding-left: 0;
+        }
+
+        .navbar {
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 1rem 2rem;
+            height: 80px;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-content {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        #menu-toggle {
+            color: var(--baust-primary);
+            cursor: pointer;
+            font-size: 1.5rem;
+            margin-right: 20px;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background-color: var(--baust-primary);
+            color: white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-right: 12px;
+        }
+        
+        .user-info .user-name {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 1rem;
+        }
+        
+        .user-info .user-role {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .dropdown-menu {
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+        
+        .content-wrapper {
+            padding: 30px;
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        .section-card {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            margin-bottom: 30px;
+        }
+        
+        .section-card-header {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--baust-primary);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .form-label {
+            font-weight: 500;
+        }
+
+        .btn-submit {
+            background-color: var(--baust-secondary);
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--baust-primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .table thead th {
+            background-color: #e9ecef;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+        
+        .modal-header {
+            background-color: var(--baust-primary);
+            color: white;
+        }
+        
+        .modal-header .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+
+        .status-badge {
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            font-weight: 700;
+            border-radius: 0.25rem;
+        }
+
+        .badge-admin {
+            background-color: var(--baust-primary);
+            color: white;
+        }
+
+        .badge-faculty {
+            background-color: var(--baust-secondary);
+            color: white;
+        }
+
+        @media (max-width: 992px) {
+            #sidebar-wrapper {
+                margin-left: calc(-1 * var(--sidebar-width));
+            }
+            
+            #wrapper.toggled #sidebar-wrapper {
+                margin-left: 0;
+            }
+
+            #page-content-wrapper {
+                padding-left: 0;
+            }
+            
+            .navbar {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="sidebar-wrapper">
+            <div class="sidebar-brand">
+                <img src="baust_logo.png" alt="BAUST Logo" class="logo-icon">
+                <span class="sidebar-brand-text">BAUST Routine</span>
+            </div>
+            <div class="list-group list-group-flush my-3">
+                <a href="admin_dashboard.html" class="list-group-item">
+                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                </a>
+                <a href="routine_management.html" class="list-group-item">
+                    <i class="fas fa-calendar-plus me-2"></i>Routine Builder
+                </a>
+                <a href="view_routines.html" class="list-group-item">
+                    <i class="fas fa-eye me-2"></i>View Routines
+                </a>
+                <a href="resource_management.html" class="list-group-item">
+                    <i class="fas fa-cogs me-2"></i>Manage Resources
+                </a>
+                <a href="user_management.html" class="list-group-item active">
+                    <i class="fas fa-users-cog me-2"></i>User Management
+                </a>
+                <a href="reports.html" class="list-group-item">
+                    <i class="fas fa-chart-line me-2"></i>Reports
+                </a>
+                <a href="#" class="list-group-item" data-bs-toggle="modal" data-bs-target="#aboutModal">
+                    <i class="fas fa-info-circle me-2"></i>About
+                </a>
+            </div>
+            <div class="sidebar-footer">
+                <div class="admin-name">Admin User</div>
+                <div class="admin-role">System Administrator</div>
+            </div>
+        </div>
+
+        <div id="page-content-wrapper">
+            <nav class="navbar">
+                <div class="navbar-content">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-align-left" id="menu-toggle"></i>
+                        <h2 class="fs-2 m-0 ms-3">User Management</h2>
+                    </div>
+                    
+                    <div class="dropdown user-profile">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="user-avatar">A</div>
+                            <div class="user-info d-none d-md-block">
+                                <div class="user-name">Admin User</div>
+                                <div class="user-role">System Administrator</div>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="admin_profile.html"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="admin_settings.html"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="login.html"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="content-wrapper">
+                <div class="row">
+                    <div class="col-lg-4 mb-4">
+                        <div class="section-card">
+                            <h3 class="section-card-header">
+                                <i class="fas fa-user-plus"></i>Add New User
+                            </h3>
+                            <form id="add-admin-form">
+                                <div class="mb-3">
+                                    <label for="new-admin-name" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="new-admin-name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="new-admin-username" class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="new-admin-username" oninput="checkUsername()" required>
+                                    <div class="invalid-feedback">Username already exists.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="new-admin-email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="new-admin-email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="new-admin-role" class="form-label">Role</label>
+                                    <select class="form-select" id="new-admin-role" required>
+                                        <option value="admin">Admin</option>
+                                        <option value="faculty">Faculty</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="new-admin-password" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="new-admin-password" required minlength="6">
+                                </div>
+                                <button type="button" class="btn btn-submit w-100 mt-2" onclick="addAdmin()">
+                                    <i class="fas fa-save me-2"></i>Save User
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="section-card">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="section-card-header mb-0">
+                                    <i class="fas fa-users"></i>Existing Users
+                                </h3>
+                                <button class="btn btn-outline-primary" onclick="loadUsersData()">
+                                    <i class="fas fa-sync-alt me-2"></i>Refresh
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Username</th>
+                                            <th>Full Name</th>
+                                            <th>Email</th>
+                                            <th>Role</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admins-table">
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted">
+                                                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                                Loading users...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aboutModalLabel"><i class="fas fa-info-circle me-2"></i>About This Project</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>This <strong>BAUST Routine & Room Management System</strong> is a web-based application designed to streamline the academic scheduling process.</p>
+                    <h5 class="mt-4">Project History</h5>
+                    <p>
+                        The initial version (v1.0) of this project was developed as a desktop-based application using <strong>JavaFX</strong>. It was created for the "Software Development Lab" course during the 2-1 semester.
+                    </p>
+                    <p>
+                        This current web-based version (v2.0) is an enhanced and more scalable implementation, developed for the "Database Management Lab" project.
+                    </p>
+                    <hr>
+                    <h5 class="mt-4">Development Team</h5>
+                    <ul>
+                        <li><strong>Abu Nabil MD. Masrur</strong></li>
+                        <li><strong>Wasi Ahmed</strong></li>
+                        <li><strong>Md. Lemon Islam Bappy</strong></li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // --- Configuration ---
+        const API_URL = 'http://127.0.0.1:8000/api';
+        let allUsers = [];
+
+        // --- UI Initialization ---
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("🚀 User Management Page Loaded");
+            
+            // Sidebar toggle
+            document.getElementById("menu-toggle").onclick = function () {
+                document.getElementById("wrapper").classList.toggle("toggled");
+            };
+
+            // Set user info from localStorage
+            const username = localStorage.getItem('username') || 'Admin';
+            const name = localStorage.getItem('fullName') || 'Admin User';
+            const role = localStorage.getItem('role') || 'System Administrator';
+
+            document.querySelectorAll('.user-name, .admin-name').forEach(el => el.textContent = name);
+            document.querySelectorAll('.user-avatar').forEach(el => el.textContent = name.charAt(0).toUpperCase());
+            document.querySelectorAll('.admin-role').forEach(el => el.textContent = role);
+
+            // Auto-toggle sidebar on mobile
+            if (window.innerWidth < 992) {
+                document.getElementById("wrapper").classList.add("toggled");
+            }
+
+            // Load initial data
+            loadUsersData();
+        });
+
+        // --- 1. Load User Data and Populate Table ---
+        async function loadUsersData() {
+            const tableBody = document.getElementById('admins-table');
+            
+            try {
+                console.log("📡 Fetching users from API...");
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">
+                            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                            Loading users...
+                        </td>
+                    </tr>`;
+                
+                const response = await fetch(`${API_URL}/users/`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                allUsers = await response.json();
+                console.log(`✅ Loaded ${allUsers.length} users:`, allUsers);
+                
+                // Sort users: Admins first, then by full name
+                allUsers.sort((a, b) => {
+                    if (a.role === 'admin' && b.role !== 'admin') return -1;
+                    if (a.role !== 'admin' && b.role === 'admin') return 1;
+                    return a.full_name.localeCompare(b.full_name);
+                });
+
+                populateAdminsTable(allUsers);
+
+            } catch (error) {
+                console.error("❌ Error loading user data:", error);
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Error connecting to API. Please check:
+                            <ul class="mt-2 text-start">
+                                <li>Server is running on http://127.0.0.1:8000</li>
+                                <li>CORS is properly configured</li>
+                                <li>API endpoint /api/users/ exists</li>
+                            </ul>
+                            <button class="btn btn-sm btn-outline-primary mt-2" onclick="loadUsersData()">
+                                <i class="fas fa-redo me-1"></i>Retry
+                            </button>
+                        </td>
+                    </tr>`;
+            }
+        }
+        
+        function populateAdminsTable(users) {
+            const tableBody = document.getElementById('admins-table');
+            
+            if (users.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">
+                            <i class="fas fa-users-slash me-2"></i>No users found
+                        </td>
+                    </tr>`;
+                return;
+            }
+            
+            tableBody.innerHTML = users.map(user => {
+                const isCurrentUser = user.username === (localStorage.getItem('username') || 'admin');
+                const isSuperAdmin = user.username === 'admin';
+                const roleDisplay = user.role === 'admin' ? 
+                    '<span class="status-badge badge-admin">Admin</span>' : 
+                    '<span class="status-badge badge-faculty">Faculty</span>';
+                
+                const statusDisplay = user.is_active ? 
+                    '<span class="badge bg-success">Active</span>' : 
+                    '<span class="badge bg-secondary">Inactive</span>';
+                
+                return `
+                    <tr id="user-row-${user.id}">
+                        <td>
+                            ${user.username}
+                            ${isCurrentUser ? '<span class="badge bg-info ms-1">You</span>' : ''}
+                        </td>
+                        <td>${user.full_name || 'N/A'}</td>
+                        <td>${user.email || 'N/A'}</td>
+                        <td>${roleDisplay}</td>
+                        <td>${statusDisplay}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-danger" 
+                                    onclick="deleteUser(${user.id})" 
+                                    ${isCurrentUser || isSuperAdmin ? 'disabled' : ''}
+                                    title="${isCurrentUser ? 'Cannot delete yourself' : (isSuperAdmin ? 'Cannot delete super admin' : 'Delete user')}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // --- 2. Username Validation ---
+        function checkUsername() {
+            const input = document.getElementById('new-admin-username');
+            const usernameExists = allUsers.some(user => 
+                user.username.toLowerCase() === input.value.toLowerCase()
+            );
+            
+            if (usernameExists) {
+                input.classList.add('is-invalid');
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        }
+
+        // --- 3. Add New User Logic ---
+        async function addAdmin() {
+            const form = document.getElementById('add-admin-form');
+            const submitButton = form.querySelector('.btn-submit');
+            
+            // Validate form
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+            
+            if (form.querySelector('.is-invalid')) {
+                alert('❌ Username already exists. Please choose a different username.');
+                return;
+            }
+            
+            const payload = {
+                username: document.getElementById('new-admin-username').value.trim(),
+                full_name: document.getElementById('new-admin-name').value.trim(),
+                email: document.getElementById('new-admin-email').value.trim(),
+                password: document.getElementById('new-admin-password').value,
+                role: document.getElementById('new-admin-role').value,
+                is_active: true
+            };
+            
+            // Show loading state
+            const originalText = submitButton.innerHTML;
+            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+            submitButton.disabled = true;
+
+            try {
+                console.log("📤 Adding new user:", payload);
+                
+                const response = await fetch(`${API_URL}/users/`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert('✅ User added successfully!');
+                    form.reset();
+                    form.classList.remove('was-validated');
+                    loadUsersData(); // Reload table
+                } else {
+                    console.error("❌ API Error:", result);
+                    let errorMessage = 'Failed to add user. ';
+                    
+                    if (result.username) errorMessage += `Username: ${result.username[0]}. `;
+                    if (result.email) errorMessage += `Email: ${result.email[0]}. `;
+                    if (result.password) errorMessage += `Password: ${result.password[0]}. `;
+                    
+                    alert(errorMessage || 'Unknown error occurred.');
+                }
+            } catch (error) {
+                console.error("❌ Network Error:", error);
+                alert('❌ Network Error: Could not connect to API. Please check if the server is running.');
+            } finally {
+                // Restore button state
+                submitButton.innerHTML = originalText;
+                submitButton.disabled = false;
+            }
+        }
+
+        // --- 4. Delete User Logic ---
+        async function deleteUser(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+            
+            if (!confirm(`Are you sure you want to delete user "${user.username}" (${user.full_name})? This action cannot be undone.`)) {
+                return;
+            }
+            
+            try {
+                console.log(`🗑️ Deleting user ID: ${userId}`);
+                
+                const response = await fetch(`${API_URL}/users/${userId}/`, {
+                    method: 'DELETE'
+                });
+
+                if (response.status === 204) {
+                    alert('✅ User deleted successfully!');
+                    loadUsersData(); // Reload data to update list
+                } else if (response.status === 404) {
+                    alert('❌ User not found. It may have been already deleted.');
+                    loadUsersData(); // Refresh list
+                } else {
+                    const error = await response.json();
+                    alert('❌ Error deleting user: ' + (error.detail || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error("❌ Network Error:", error);
+                alert('❌ Network Error: Could not connect to API.');
+            }
+        }
+
+        // --- Utility Functions ---
+        function validateForm() {
+            const form = document.getElementById('add-admin-form');
+            return form.checkValidity();
+        }
+    </script>
+</body>
+</html>

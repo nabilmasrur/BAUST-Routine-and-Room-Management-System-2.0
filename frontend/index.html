@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAUST Routine and Room Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            background: #0a0e27;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Gradient Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                #1e3c72,
+                #2a5298,
+                #7e57c2,
+                #5c6bc0,
+                #42a5f5,
+                #26c6da,
+                #66bb6a,
+                #9ccc65
+            );
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            opacity: 0.15;
+            z-index: -2;
+        }
+
+        @keyframes gradientShift {
+            0% { transform: rotate(0deg) scale(1.5); }
+            50% { transform: rotate(180deg) scale(1.8); }
+            100% { transform: rotate(360deg) scale(1.5); }
+        }
+
+        /* Particle Effect Background */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(91, 173, 254, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(120, 237, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(200, 125, 255, 0.15) 0%, transparent 50%);
+        }
+
+        /* Floating Orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.4;
+            animation: float 20s infinite ease-in-out;
+            z-index: -1;
+        }
+
+        .orb1 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            top: -150px;
+            left: -150px;
+            animation-delay: 0s;
+        }
+
+        .orb2 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            bottom: -200px;
+            right: -200px;
+            animation-delay: 5s;
+        }
+
+        .orb3 {
+            width: 250px;
+            height: 250px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            top: 50%;
+            left: 50%;
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(100px, -100px) scale(1.1); }
+            50% { transform: translate(-100px, 100px) scale(0.9); }
+            75% { transform: translate(50px, 50px) scale(1.05); }
+        }
+
+        /* Main Container */
+        .main-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header Section */
+        .header-container {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-container {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 30px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            background: linear-gradient(45deg, #00dbde, #fc00ff);
+            background-clip: padding-box;
+            animation: rotate 3s linear infinite;
+        }
+
+        .logo-ring::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00dbde, #fc00ff);
+            z-index: -1;
+            filter: blur(15px);
+            opacity: 0.5;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .logo-inner {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-inner img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .main-heading {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 20%, #f093fb 40%, #4facfe 60%, #00f2fe 80%, #43e97b 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: textGradient 3s ease infinite;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+        }
+
+        @keyframes textGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .sub-heading {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1.2rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Content Area */
+        .content-container {
+            width: 100%;
+            max-width: 1400px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        /* Glass Card Design */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 40px;
+            box-shadow: 
+                0 8px 32px 0 rgba(31, 38, 135, 0.37),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            animation: fadeUp 0.8s ease-out;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 580px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .glass-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 
+                0 15px 40px 0 rgba(31, 38, 135, 0.5),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* Card Header */
+        .card-header-premium {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 35px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .card-header-premium::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, #00dbde 0%, #fc00ff 100%);
+            border-radius: 3px;
+        }
+
+        .card-title-wrapper {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .icon-box i {
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .icon-box::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            filter: blur(15px);
+            opacity: 0.4;
+            z-index: -1;
+        }
+
+        .card-heading {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        /* Dropdown Toggle Button */
+        .dropdown-toggle-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .dropdown-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .dropdown-toggle-btn i {
+            color: white;
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-toggle-btn.active i {
+            transform: rotate(90deg);
+        }
+
+        /* Dropdown Menu */
+        .dropdown-options {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, margin 0.4s ease;
+            margin-bottom: 0;
+        }
+
+        .dropdown-options.show {
+            max-height: 300px;
+            margin-bottom: 25px;
+        }
+
+        .dropdown-item-custom {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .dropdown-item-custom:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateX(10px);
+            color: white;
+        }
+
+        .dropdown-item-custom i {
+            width: 25px;
+            margin-right: 12px;
+            color: #00dbde;
+            font-size: 1.1rem;
+        }
+
+        /* Form Content */
+        .form-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label-custom {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+        }
+
+        .form-label-custom i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+            background: linear-gradient(135deg, #00dbde 0%, #fc00ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-control-custom {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-control-custom:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .form-control-custom option {
+            background: #1a1a2e;
+            color: white;
+        }
+
+        /* Button Container */
+        .button-container {
+            margin-top: auto;
+            padding-top: 20px;
+        }
+
+        /* Premium Buttons */
+        .btn-premium {
+            width: 100%;
+            padding: 16px 35px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            color: white;
+        }
+
+        .btn-primary-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary-gradient:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary-gradient {
+            background: linear-gradient(135deg, #00dbde 0%, #fc00ff 100%);
+            box-shadow: 0 10px 30px rgba(252, 0, 255, 0.4);
+        }
+
+        .btn-secondary-gradient:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(252, 0, 255, 0.6);
+        }
+
+        .btn-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.5s ease;
+        }
+
+        .btn-premium:hover::before {
+            left: 100%;
+        }
+
+        /* Results Area */
+        .results-area {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+            animation: expandDown 0.5s ease;
+        }
+
+        @keyframes expandDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                max-height: 600px;
+                transform: translateY(0);
+            }
+        }
+
+        .results-header {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .results-header i {
+            margin-right: 10px;
+            color: #00dbde;
+        }
+
+        /* Table */
+        .table-premium {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .table-premium thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .table-premium th {
+            padding: 18px;
+            color: white;
+            font-weight: 600;
+            text-align: left;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            border: none;
+        }
+
+        .table-premium tbody {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .table-premium td {
+            padding: 15px 18px;
+            color: rgba(255, 255, 255, 0.9);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.95rem;
+        }
+
+        .table-premium tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .table-premium tbody tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.02);
+        }
+
+        /* Footer */
+        .footer-area {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .admin-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 15px 35px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-link::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            top: 0;
+            left: -100%;
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .admin-link:hover {
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            border-color: transparent;
+        }
+
+        .admin-link:hover::before {
+            left: 0;
+        }
+
+        .admin-link i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Alert */
+        .alert-custom {
+            padding: 15px 20px;
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 10px;
+            color: #ff6b6b;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1100px) {
+            .content-container {
+                grid-template-columns: 1fr;
+                max-width: 600px;
+                margin: 0 auto 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-heading {
+                font-size: 1.8rem;
+            }
+            
+            .glass-card {
+                padding: 30px 20px;
+                min-height: auto;
+            }
+
+            .card-heading {
+                font-size: 1.5rem;
+            }
+
+            .form-control-custom {
+                padding: 12px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles"></div>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+
+    <div class="main-wrapper">
+        <div class="header-container">
+            <div class="logo-container">
+                <div class="logo-ring"></div>
+                <div class="logo-inner">
+                    <img src="baust_logo.png" alt="BAUST Logo">
+                </div>
+            </div>
+            <h1 class="main-heading">BAUST Routine and Room Management System</h1>
+            <p class="sub-heading">Intelligent Scheduling Platform</p>
+        </div>
+
+        <div class="content-container">
+            <div class="glass-card">
+                <div class="card-header-premium">
+                    <div class="card-title-wrapper">
+                        <div class="icon-box">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <h2 class="card-heading">Class Routine</h2>
+                    </div>
+                    <div class="dropdown-toggle-btn" onclick="toggleDropdown('routine-dropdown', this)">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+
+                <div id="routine-dropdown" class="dropdown-options">
+                    <a href="routine_view.html" class="dropdown-item-custom">
+                        <i class="fas fa-eye"></i>
+                        <span>View Routine</span>
+                    </a>
+                    <a href="#" class="dropdown-item-custom">
+                        <i class="fas fa-download"></i>
+                        <span>Download Routine</span>
+                    </a>
+                    <a href="#" class="dropdown-item-custom">
+                        <i class="fas fa-print"></i>
+                        <span>Print Routine</span>
+                    </a>
+                </div>
+                
+                <div class="form-content">
+                    <form id="routine-form">
+                        <div class="form-group">
+                            <label class="form-label-custom">
+                                <i class="fas fa-building"></i>
+                                Department
+                            </label>
+                            <select class="form-control-custom" id="department" required>
+                                <option value="" disabled selected>Select department</option>
+                                <!-- Options will be loaded from API -->
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label-custom">
+                                <i class="fas fa-graduation-cap"></i>
+                                Level
+                            </label>
+                            <select class="form-control-custom" id="level" required>
+                                <option value="" disabled selected>Select your level</option>
+                                <option value="1">Level 1</option>
+                                <option value="2">Level 2</option>
+                                <option value="3">Level 3</option>
+                                <option value="4">Level 4</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label-custom">
+                                <i class="fas fa-calendar-alt"></i>
+                                Term
+                            </label>
+                            <select class="form-control-custom" id="term" required>
+                                <option value="" disabled selected>Select term</option>
+                                <option value="1">Term I</option>
+                                <option value="2">Term II</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label-custom">
+                                <i class="fas fa-users"></i>
+                                Section
+                            </label>
+                            <select class="form-control-custom" id="section" required>
+                                <option value="" disabled selected>Select section</option>
+                                <option value="A">Section A</option>
+                                <option value="B">Section B</option>
+                                <option value="C">Section C</option>
+                                <option value="D">Section D</option>
+                                <option value="E">Section E</option>
+                            </select>
+                        </div>
+
+                        <div class="button-container">
+                            <button type="submit" class="btn-premium btn-primary-gradient">
+                                <i class="fas fa-search"></i> View Routine
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <div class="card-header-premium">
+                    <div class="card-title-wrapper">
+                        <div class="icon-box" style="background: linear-gradient(135deg, #00dbde 0%, #fc00ff 100%);">
+                            <i class="fas fa-door-open"></i>
+                        </div>
+                        <h2 class="card-heading">Room Finder</h2>
+                    </div>
+                    <div class="dropdown-toggle-btn" onclick="toggleDropdown('room-dropdown', this)">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+
+                <div id="room-dropdown" class="dropdown-options">
+                    <a href="#" class="dropdown-item-custom" onclick="activateSearch(event)">
+                        <i class="fas fa-search"></i>
+                        <span>Search Available Rooms</span>
+                    </a>
+                    <a href="#" class="dropdown-item-custom">
+                        <i class="fas fa-calendar-week"></i>
+                        <span>View Room Schedule</span>
+                    </a>
+                    <a href="#" class="dropdown-item-custom">
+                        <i class="fas fa-clipboard-check"></i>
+                        <span>Book a Room</span>
+                    </a>
+                </div>
+
+                <div class="form-content">
+                    <div class="form-group">
+                        <label class="form-label-custom">
+                            <i class="fas fa-calendar-day"></i>
+                            Select Day
+                        </label>
+                        <select class="form-control-custom" id="day">
+                            <option value="" disabled selected>Choose day</option>
+                            <option value="Sunday">Sunday</option>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label-custom">
+                            <i class="fas fa-clock"></i>
+                            Time Slot
+                        </label>
+                        <select class="form-control-custom" id="time">
+                            <option value="" disabled selected>Choose time slot</option>
+                            <option value="08:00-08:50">08:00 - 08:50 AM</option>
+                            <option value="09:00-09:50">09:00 - 09:50 AM</option>
+                            <option value="10:00-10:50">10:00 - 10:50 AM</option>
+                            <option value="11:30-12:20">11:30 AM - 12:20 PM</option>
+                            <option value="12:30-01:20">12:30 - 01:20 PM</option>
+                            <option value="01:30-02:20">01:30 - 02:20 PM</option>
+                            <option value="02:30-03:20">02:30 - 03:20 PM</option>
+                            <option value="03:30-04:20">03:30 - 04:20 PM</option>
+                            <option value="04:30-05:20">04:30 - 05:20 PM</option>
+                        </select>
+                    </div>
+
+                    <div class="button-container">
+                        <button type="button" class="btn-premium btn-secondary-gradient" onclick="searchRooms()">
+                            <i class="fas fa-search-location"></i> Search Rooms
+                        </button>
+                    </div>
+
+                    <div id="room-results" class="results-area">
+                        <div class="results-header">
+                            <i class="fas fa-check-circle"></i>
+                            <span id="result-title">Available Rooms</span>
+                        </div>
+                        <table class="table-premium">
+                            <thead>
+                                <tr>
+                                    <th>Room Number</th>
+                                    <th>Capacity</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Results will be populated here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-area">
+            <a href="login.html" class="admin-link">
+                <i class="fas fa-shield-alt"></i>
+                Admin & Teacher Panel
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // API Base URL
+        const API_URL = 'http://127.0.0.1:8000/api';
+        let allDepartments = [];
+        let allRooms = [];
+
+        // --- 1. Data Loading and Initialization ---
+        async function loadDepartmentsAndRooms() {
+            try {
+                console.log("📡 Loading departments and rooms...");
+                
+                // Fetch data concurrently
+                const [deptRes, roomRes] = await Promise.all([
+                    fetch(`${API_URL}/departments/`).then(res => {
+                        if (!res.ok) throw new Error('Failed to fetch departments');
+                        return res.json();
+                    }),
+                    fetch(`${API_URL}/rooms/`).then(res => {
+                        if (!res.ok) throw new Error('Failed to fetch rooms');
+                        return res.json();
+                    })
+                ]);
+                
+                allDepartments = deptRes;
+                allRooms = roomRes;
+                
+                // Populate Department dropdown in Routine Card
+                const deptSelect = document.getElementById('department');
+                allDepartments.forEach(dept => { 
+                    deptSelect.innerHTML += `<option value="${dept.id}">${dept.name} (${dept.code || 'N/A'})</option>`; 
+                });
+
+                console.log("✅ Departments and rooms loaded successfully");
+
+            } catch (error) {
+                console.error('❌ Error loading initial data:', error);
+                showAlert('Could not load department/room data. Server connection failed.');
+            }
+        }
+        
+        // Toggle Dropdown Function
+        function toggleDropdown(dropdownId, button) {
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.classList.toggle('show');
+            button.classList.toggle('active');
+        }
+
+        // Activate Search from Dropdown
+        function activateSearch(event) {
+            event.preventDefault();
+            const daySelect = document.getElementById('day');
+            
+            if (daySelect) {
+                daySelect.focus();
+                daySelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+     // index.html এর JavaScript সেকশন - শুধু পরিবর্তিত অংশ
+
+// Form Submit Handler (Routine Form) - FIXED VERSION
+document.getElementById('routine-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const departmentId = document.getElementById('department').value;
+    const level = document.getElementById('level').value;
+    const term = document.getElementById('term').value;
+    const section = document.getElementById('section').value;
+    
+    // Validate form
+    if (!departmentId || !level || !term || !section) {
+        showAlert('Please fill all required fields');
+        return;
+    }
+    
+    const levelTerm = `${level}-${term === '1' ? 'I' : 'II'}`;
+    const semester = 'Summer'; // বা আপনার সিস্টেম অনুযায়ী
+    const year = '2025';
+    
+    const button = this.querySelector('button[type="submit"]');
+    const originalText = button.innerHTML;
+    
+    // Show loading state
+    button.innerHTML = '<span class="spinner"></span> Loading...';
+    button.disabled = true;
+    
+    try {
+        // ✅ FIX: API থেকে সঠিক routine খুঁজে বের করুন
+        const response = await fetch(`${API_URL}/routines/`);
+        const routines = await response.json();
+        
+        const matchingRoutine = routines.find(r => 
+            r.department == parseInt(departmentId) && 
+            r.level_term === levelTerm && 
+            r.section === section &&
+            r.semester === semester &&
+            r.year == parseInt(year)
+        );
+        
+        if (matchingRoutine) {
+            // ✅ Store routine ID and details
+            sessionStorage.setItem('routineId', matchingRoutine.id);
+            sessionStorage.setItem('selectedDept', departmentId); 
+            sessionStorage.setItem('selectedLevel', level);
+            sessionStorage.setItem('selectedTerm', term === '1' ? 'I' : 'II');
+            sessionStorage.setItem('selectedSection', section);
+            
+            console.log('✅ Routine found:', matchingRoutine);
+            
+            // Redirect to routine view
+            window.location.href = 'routine_view.html';
+        } else {
+            // ❌ কোন routine পাওয়া যায়নি
+            button.innerHTML = originalText;
+            button.disabled = false;
+            showAlert('No routine found for this selection. Please check with admin.');
+            console.log('❌ No matching routine for:', { departmentId, levelTerm, section, semester, year });
+        }
+        
+    } catch (error) {
+        console.error('❌ Error fetching routine:', error);
+        button.innerHTML = originalText;
+        button.disabled = false;
+        showAlert('Error connecting to server. Please try again.');
+    }
+});
+        
+        // Room Finder Logic (Search Rooms)
+        async function searchRooms() {
+            const day = document.getElementById('day').value;
+            const timeSelect = document.getElementById('time').value;
+            const resultsDiv = document.getElementById('room-results');
+            const tbody = document.querySelector('#room-results tbody');
+            
+            if (!day || !timeSelect) {
+                showAlert('Please select both day and time slot');
+                return;
+            }
+
+            const button = document.querySelector('.btn-secondary-gradient');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<span class="spinner"></span> Searching...';
+            button.disabled = true;
+            
+            // Extract start time (HH:MM) from time slot (HH:MM-HH:MM)
+            const [startTime] = timeSelect.split('-');
+            const apiStartTime = startTime + ':00'; // HH:MM:SS format
+
+            try {
+                console.log(`🔍 Searching rooms for ${day} at ${apiStartTime}`);
+                
+                // API Call: Fetch available rooms
+                const response = await fetch(`${API_URL}/available_rooms/?day=${day}&start_time=${apiStartTime}&duration=1`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                const availableRooms = data.rooms || [];
+
+                // Display results
+                if (availableRooms.length === 0) {
+                     tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 30px; color: white;">
+                                <i class="fas fa-times-circle" style="font-size: 2rem; color: #ff6b6b; margin-bottom: 10px;"></i>
+                                <p>No available rooms for this time slot</p>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    tbody.innerHTML = availableRooms.map(room => `
+                        <tr>
+                            <td>${room.room_number}</td>
+                            <td>${room.capacity} Students</td>
+                            <td>${room.room_type ? room.room_type.toUpperCase() : 'N/A'}</td>
+                            <td><span style="color: #43e97b;">✓ Available</span></td>
+                        </tr>
+                    `).join('');
+                }
+
+                resultsDiv.style.display = 'block';
+                resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            } catch (error) {
+                console.error('❌ Error fetching available rooms:', error);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="color: #ff6b6b; text-align: center;">
+                            <i class="fas fa-exclamation-triangle"></i> API Error: ${error.message}
+                        </td>
+                    </tr>
+                `;
+                resultsDiv.style.display = 'block';
+            } finally {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+        
+        // Show Alert Function
+        function showAlert(message) {
+            // Create alert element
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert-custom';
+            alertDiv.innerHTML = `<i class="fas fa-exclamation-circle" style="margin-right: 10px;"></i> ${message}`;
+            
+            // Find the appropriate card to append the alert
+            const activeCard = document.activeElement ? document.activeElement.closest('.glass-card') : 
+                              document.querySelector('.glass-card');
+            
+            if (activeCard) {
+                activeCard.appendChild(alertDiv);
+                
+                // Remove alert after 3 seconds
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.remove();
+                    }
+                }, 3000);
+            }
+        }
+
+        // Initialize Data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDepartmentsAndRooms();
+            
+            // Add year to console
+            const year = new Date().getFullYear();
+            console.log(`BAUST Routine and Room Management System © ${year}`);
+        });
+    </script>
+</body>
+</html>

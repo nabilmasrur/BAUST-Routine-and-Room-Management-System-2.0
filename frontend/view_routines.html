@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Routines | BAUST</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --baust-primary: #003366;
+            --baust-secondary: #005A31;
+            --background-light: #f4f7f6;
+            --text-dark: #343a40;
+            --text-light: #f8f9fa;
+            --border-color: #e9ecef;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            font-size: 16px;
+        }
+
+        #wrapper {
+            display: flex;
+            transition: padding-left 0.3s ease;
+        }
+
+        /* Sidebar */
+        #sidebar-wrapper {
+            min-height: 100vh;
+            width: var(--sidebar-width);
+            margin-left: 0;
+            background-color: var(--baust-primary);
+            color: var(--text-light);
+            transition: margin 0.3s ease-out;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #wrapper.toggled #sidebar-wrapper {
+            margin-left: calc(-1 * var(--sidebar-width));
+        }
+
+        .sidebar-heading {
+            background-color: #002244;
+            padding: 1.25rem 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+        }
+
+        .list-group {
+            flex-grow: 1;
+        }
+
+        .list-group-item {
+            background-color: transparent !important;
+            border: none !important;
+            color: rgba(255, 255, 255, 0.8) !important;
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+            font-size: 0.95rem;
+        }
+
+        .list-group-item:hover, .list-group-item.active {
+            background-color: var(--baust-secondary) !important;
+            color: white !important;
+            border-left-color: #ffc107;
+            transform: translateX(5px);
+        }
+        
+        .list-group-item i {
+            width: 25px;
+            margin-right: 5px;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: auto;
+        }
+        
+        .sidebar-footer .admin-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .sidebar-footer .admin-role {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Page Content */
+        #page-content-wrapper {
+            width: 100%;
+            padding-left: var(--sidebar-width);
+            transition: padding-left 0.3s ease-out;
+        }
+        
+        #wrapper.toggled #page-content-wrapper {
+            padding-left: 0;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 1rem 2rem;
+            height: 80px;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-content {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        #menu-toggle {
+            color: var(--baust-primary);
+            cursor: pointer;
+            font-size: 1.5rem;
+            margin-right: 20px;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background-color: var(--baust-primary);
+            color: white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-right: 12px;
+        }
+        
+        .user-info .user-name {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 1rem;
+        }
+        
+        .user-info .user-role {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .dropdown-menu {
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .content-wrapper {
+            padding: 30px;
+            max-width: 1600px;
+            margin: auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--baust-primary);
+            margin: 0;
+        }
+        
+        .page-subtitle {
+            color: #6c757d;
+            font-size: 1.1rem;
+            margin-top: 5px;
+        }
+
+        .btn-create-routine {
+            background-color: var(--baust-secondary);
+            color: white;
+            font-weight: 600;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-create-routine:hover {
+            background-color: var(--baust-primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 90, 49, 0.3);
+        }
+
+        .section-card {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            margin-bottom: 30px;
+        }
+        
+        .section-card-header {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--baust-primary);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .search-filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-container {
+            position: relative;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .search-input {
+            padding-left: 45px;
+            border-radius: 8px;
+            height: 50px;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            z-index: 10;
+        }
+
+        .filter-select {
+            min-width: 180px;
+            height: 50px;
+        }
+        
+        /* Routine Card */
+        .routine-card {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .routine-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--baust-primary), var(--baust-secondary));
+        }
+
+        .routine-card:hover {
+            border-color: var(--baust-secondary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 90, 49, 0.1);
+        }
+
+        .routine-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .routine-title {
+            color: var(--baust-primary);
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .routine-meta {
+            color: #6c757d;
+            font-size: 0.9rem;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .routine-meta span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8f9fa;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        
+        .class-count-badge {
+            background-color: var(--baust-primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .routine-body {
+            font-size: 0.95rem;
+        }
+        
+        .info-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            background-color: var(--background-light);
+            padding: 12px 15px;
+            border-radius: 8px;
+            border-left: 3px solid var(--baust-secondary);
+        }
+
+        .info-label {
+            color: #6c757d;
+            font-size: 0.8rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .routine-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view {
+            background-color: var(--baust-primary);
+            color: white;
+            border: none;
+        }
+
+        .btn-view:hover {
+            background-color: #00264d;
+            transform: translateY(-2px);
+        }
+
+        .btn-edit {
+            background-color: #198754;
+            color: white;
+            border: none;
+        }
+
+        .btn-edit:hover {
+            background-color: #146c43;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+        }
+
+        .btn-delete:hover {
+            background-color: #bb2d3b;
+            transform: translateY(-2px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h4 {
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, var(--baust-primary), var(--baust-secondary));
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stats-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 992px) {
+            #sidebar-wrapper {
+                margin-left: calc(-1 * var(--sidebar-width));
+            }
+            
+            #wrapper.toggled #sidebar-wrapper {
+                margin-left: 0;
+            }
+
+            #page-content-wrapper {
+                padding-left: 0;
+            }
+            
+            .navbar {
+                padding: 1rem;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 20px;
+                align-items: flex-start;
+            }
+            
+            .search-filter-bar {
+                flex-direction: column;
+            }
+            
+            .search-container {
+                min-width: 100%;
+            }
+            
+            .routine-card-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .routine-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="sidebar-wrapper">
+            <div class="sidebar-heading">
+                <img src="baust_logo.png" alt="BAUST Logo" class="logo-icon">
+                <span>BAUST Routine</span>
+            </div>
+            <div class="list-group list-group-flush my-3">
+                <a href="admin_dashboard.html" class="list-group-item">
+                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                </a>
+                <a href="routine_management.html" class="list-group-item">
+                    <i class="fas fa-calendar-plus me-2"></i>Routine Builder
+                </a>
+                <a href="view_routines.html" class="list-group-item active">
+                    <i class="fas fa-eye me-2"></i>View Routines
+                </a>
+                <a href="resource_management.html" class="list-group-item">
+                    <i class="fas fa-cogs me-2"></i>Manage Resources
+                </a>
+                <a href="#" class="list-group-item" data-bs-toggle="modal" data-bs-target="#passwordModal">
+                    <i class="fas fa-users-cog me-2"></i>User Management
+                </a>
+                <a href="reports.html" class="list-group-item">
+                    <i class="fas fa-chart-line me-2"></i>Reports
+                </a>
+                <a href="#" class="list-group-item" data-bs-toggle="modal" data-bs-target="#aboutModal">
+                    <i class="fas fa-info-circle me-2"></i>About
+                </a>
+            </div>
+            <div class="sidebar-footer">
+                <div class="admin-name">Admin User</div>
+                <div class="admin-role">System Administrator</div>
+            </div>
+        </div>
+
+        <div id="page-content-wrapper">
+            <nav class="navbar">
+                <div class="navbar-content">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-align-left" id="menu-toggle"></i>
+                        <h2 class="fs-2 m-0 ms-3">View Routines</h2>
+                    </div>
+                    <div class="dropdown user-profile">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="user-avatar">A</div>
+                            <div class="user-info d-none d-md-block">
+                                <div class="user-name">Admin User</div>
+                                <div class="user-role">System Administrator</div>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="admin_profile.html"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="admin_settings.html"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="login.html"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">All Routines</h1>
+                        <p class="page-subtitle">Manage and view all academic routines</p>
+                    </div>
+                    <a href="routine_management.html" class="btn-create-routine">
+                        <i class="fas fa-plus-circle"></i>
+                        Create New Routine
+                    </a>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card">
+                            <div class="stats-number" id="total-routines">0</div>
+                            <div class="stats-label">Total Routines</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card">
+                            <div class="stats-number" id="active-routines">0</div>
+                            <div class="stats-label">Active This Semester</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card">
+                            <div class="stats-number" id="cse-routines">0</div>
+                            <div class="stats-label">CSE Department</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card">
+                            <div class="stats-number" id="total-classes">0</div>
+                            <div class="stats-label">Total Classes</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <h3 class="section-card-header"><i class="fas fa-filter"></i>Filter & Search Routines</h3>
+                    
+                    <div class="search-filter-bar">
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="form-control search-input" id="search-input" placeholder="Search by department, level, section, advisor...">
+                        </div>
+                        <select class="form-select filter-select" id="filter-department" onchange="filterRoutines()">
+                            <option value="">All Departments</option>
+                            </select>
+                        <select class="form-select filter-select" id="filter-semester" onchange="filterRoutines()">
+                            <option value="">All Semesters</option>
+                            <option value="Summer">Summer</option>
+                            <option value="Winter">Winter</option>
+                        </select>
+                        <select class="form-select filter-select" id="filter-level" onchange="filterRoutines()">
+                            <option value="">All Levels</option>
+                            <option value="1-I">1-I</option>
+                            <option value="1-II">1-II</option>
+                            <option value="2-I">2-I</option>
+                            <option value="2-II">2-II</option>
+                            <option value="3-I">3-I</option>
+                            <option value="3-II">3-II</option>
+                            <option value="4-I">4-I</option>
+                            <option value="4-II">4-II</option>
+                        </select>
+                    </div>
+
+                    <div id="routines-container">
+                        <p class="text-center p-5">Loading routines...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="passwordModalLabel"><i class="fas fa-shield-alt me-2"></i>Admin Verification</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>To access User Management, please enter your password.</p>
+                    <div class="form-group">
+                        <label for="admin-password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="admin-password" required>
+                        <div class="invalid-feedback">Incorrect password. Please try again.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" style="background-color: var(--baust-secondary);" onclick="verifyPassword()">Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aboutModalLabel"><i class="fas fa-info-circle me-2"></i>About This Project</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>This <strong>BAUST Routine & Room Management System</strong> is a web-based application designed to streamline the academic scheduling process.</p>
+                    <h5 class="mt-4">Project History</h5>
+                    <p>The initial version (v1.0) of this project was developed as a desktop-based application using <strong>JavaFX</strong>. It was created for the "Software Development Lab" course during the 2-1 semester.</p>
+                    <p>This current web-based version (v2.0) is an enhanced and more scalable implementation, developed for the "Database Management Lab" project.</p>
+                    <hr>
+                    <h5 class="mt-4">Development Team</h5>
+                    <ul>
+                        <li><strong>Abu Nabil MD. Masrur</strong></li>
+                        <li><strong>Wasi Ahmed</strong></li>
+                        <li><strong>Md. Lemon Islam Bappy</strong></li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_URL = 'http://127.0.0.1:8000/api';
+        let allRoutines = []; 
+        let allDepartments = []; 
+        let allSchedules = []; 
+
+        var el = document.getElementById("wrapper");
+        var toggleButton = document.getElementById("menu-toggle");
+        
+        toggleButton.onclick = function () {
+            el.classList.toggle("toggled");
+        };
+
+        // --- 2. Data Fetching and Initialization ---
+        async function loadRoutines() {
+            console.log("📡 Fetching all routine data from API...");
+            
+            // FIX: Retrieve and set username immediately for UI
+            const username = localStorage.getItem('username') || 'Admin User';
+            document.querySelectorAll('.user-name, .admin-name').forEach(el => el.textContent = username);
+            document.querySelectorAll('.user-avatar').forEach(el => el.textContent = username.charAt(0).toUpperCase());
+
+            try {
+                // Fetch all data concurrently
+                const [routinesRes, departmentsRes, schedulesRes] = await Promise.all([
+                    fetch(`${API_URL}/routines/`).then(res => res.json()),
+                    fetch(`${API_URL}/departments/`).then(res => res.json()),
+                    fetch(`${API_URL}/schedules/`).then(res => res.json())
+                ]);
+
+                allRoutines = routinesRes;
+                allDepartments = departmentsRes;
+                allSchedules = schedulesRes;
+                
+                console.log(`✅ Loaded ${allRoutines.length} routines.`);
+                
+                // Populate the Department Filter dropdown
+                const deptFilter = document.getElementById('filter-department');
+                // Clear existing options first
+                deptFilter.innerHTML = '<option value="">All Departments</option>'; 
+                
+                allDepartments.forEach(dept => {
+                    // Assuming department code is used for filtering
+                    deptFilter.innerHTML += `<option value="${dept.code}">${dept.name}</option>`;
+                });
+
+                // Initial display
+                updateStats(allRoutines);
+                displayRoutines(allRoutines);
+
+            } catch (error) {
+                console.error('❌ Error loading routines from API:', error);
+                document.getElementById('routines-container').innerHTML = 
+                    `<div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h4>Connection Error</h4>
+                        <p>Could not connect to the backend server. Please ensure Django is running.</p>
+                    </div>`;
+            }
+        }
+
+        // --- 3. Update Stats based on API Data ---
+        function updateStats(routines) {
+            const totalRoutines = routines.length;
+            // Assuming current semester is 'Summer 2025' for demonstration
+            const activeRoutines = routines.filter(r => r.semester === 'Summer' && r.year === 2025).length;
+            
+            // Count CSE routines using the department ID
+            const cseDept = allDepartments.find(d => d.code === 'CSE');
+            const cseRoutines = routines.filter(r => cseDept && r.department == cseDept.id).length;
+
+            const totalClasses = allSchedules.length; // Total individual class entries
+            
+            document.getElementById('total-routines').textContent = totalRoutines;
+            document.getElementById('active-routines').textContent = activeRoutines;
+            document.getElementById('cse-routines').textContent = cseRoutines;
+            document.getElementById('total-classes').textContent = totalClasses;
+        }
+
+        // --- 4. Display Routines in Cards ---
+        function displayRoutines(routines) {
+            const container = document.getElementById('routines-container');
+            if (routines.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-times"></i>
+                        <h4>No Routines Found</h4>
+                        <p>No routines match your search criteria. Try adjusting your filters or create a new routine.</p>
+                        <a href="routine_management.html" class="btn-create-routine mt-3">
+                            <i class="fas fa-plus-circle"></i>
+                            Create Your First Routine
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = routines.map((routine, index) => {
+                // Find Department Name
+                const dept = allDepartments.find(d => d.id === routine.department);
+                const deptCode = dept ? dept.code : 'N/A';
+
+                // Count total classes for this specific routine ID
+                const classesCount = allSchedules.filter(s => s.routine === routine.id).length;
+
+                // FIX: Use routine.created_at which comes from the API
+                const createdDate = new Date(routine.created_at).toLocaleDateString();
+
+                return `
+                <div class="routine-card">
+                    <div class="routine-card-header">
+                        <div style="flex: 1;">
+                            <div class="routine-title">
+                                ${deptCode} - Level ${routine.level_term} - Section ${routine.section}
+                            </div>
+                            <div class="routine-meta">
+                                <span><i class="fas fa-calendar"></i>${routine.semester} ${routine.year}</span>
+                                <span><i class="fas fa-user-tie"></i>${routine.advisor_name}</span>
+                                <span><i class="fas fa-phone"></i>${routine.advisor_phone}</span>
+                                <span class="class-count-badge">${classesCount} Classes</span>
+                            </div>
+                        </div>
+                        <div class="routine-actions">
+                            <button class="btn-action btn-view" onclick="viewRoutine(${routine.id})">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="btn-action btn-edit" onclick="editRoutine(${routine.id})">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn-action btn-delete" onclick="deleteRoutine(${routine.id})">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-item">
+                            <span class="info-label">DPC Information</span>
+                            <span class="info-value">${routine.dpc_name} (${routine.dpc_phone})</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Year</span>
+                            <span class="info-value">${routine.year}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Created Date</span>
+                            <span class="info-value">${createdDate}</span>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // --- 5. Filter and Search Logic ---
+        function filterRoutines() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const deptCodeFilter = document.getElementById('filter-department').value;
+            const semesterFilter = document.getElementById('filter-semester').value;
+            const levelFilter = document.getElementById('filter-level').value;
+            
+            // Find department ID if code is selected
+            const filteredDept = allDepartments.find(d => d.code === deptCodeFilter);
+            const deptIdFilter = filteredDept ? filteredDept.id : null;
+
+            let filteredRoutines = allRoutines.filter(routine => {
+                // Find department name/code for searching
+                const dept = allDepartments.find(d => d.id === routine.department);
+                const deptCode = dept ? dept.code : '';
+                const deptName = dept ? dept.name : '';
+
+                // Search match check
+                const matchesSearch = 
+                    deptCode.toLowerCase().includes(searchTerm) ||
+                    deptName.toLowerCase().includes(searchTerm) ||
+                    routine.level_term.toLowerCase().includes(searchTerm) ||
+                    routine.section.toLowerCase().includes(searchTerm) ||
+                    routine.advisor_name.toLowerCase().includes(searchTerm) ||
+                    routine.dpc_name.toLowerCase().includes(searchTerm);
+                
+                // Filter checks
+                const matchesDept = !deptIdFilter || routine.department === deptIdFilter;
+                const matchesSemester = !semesterFilter || routine.semester === semesterFilter;
+                const matchesLevel = !levelFilter || routine.level_term === levelFilter;
+                
+                return matchesSearch && matchesDept && matchesSemester && matchesLevel;
+            });
+            
+            displayRoutines(filteredRoutines);
+        }
+
+        document.getElementById('search-input').addEventListener('input', filterRoutines);
+        document.getElementById('filter-department').addEventListener('change', filterRoutines);
+        document.getElementById('filter-semester').addEventListener('change', filterRoutines);
+        document.getElementById('filter-level').addEventListener('change', filterRoutines);
+
+
+        // --- 6. Action Functions (View, Edit, Delete) ---
+        async function deleteRoutine(routineId) {
+            if (confirm('Are you sure you want to delete this routine? This action cannot be undone.')) {
+                try {
+                    // FIX: Use API call for deletion
+                    const response = await fetch(`${API_URL}/routines/${routineId}/`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.status === 204) {
+                        alert('Routine deleted successfully!');
+                        loadRoutines(); // Reload data
+                    } else {
+                        const error = await response.json();
+                        alert('Error deleting routine: ' + (error.detail || JSON.stringify(error)));
+                    }
+                } catch (error) {
+                    console.error('Network Error:', error);
+                    alert('Could not connect to server for deletion.');
+                }
+            }
+        }
+
+        function viewRoutine(routineId) {
+            // FIX: Pass routine ID via URL parameter 'id' for viewing
+            window.location.href = `routine_view.html?id=${routineId}`;
+        }
+
+        function editRoutine(routineId) {
+            // FIX: Pass routine ID via URL parameter 'edit' to load form data
+            // The routine_management.html page must handle fetching data using this ID.
+            window.location.href = `routine_management.html?edit=${routineId}`;
+        }
+
+        function verifyPassword() {
+            const passwordInput = document.getElementById('admin-password');
+            const defaultPassword = 'admin';
+
+            if (passwordInput.value === defaultPassword) {
+                window.location.href = 'user_management.html';
+            } else {
+                passwordInput.classList.add('is-invalid');
+            }
+        }
+        
+        document.getElementById('admin-password')?.addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+        });
+
+        // Initialize
+        window.onload = function() {
+            if (window.innerWidth < 992) {
+                el.classList.add("toggled");
+            }
+            loadRoutines(); // Start loading data from API
+        };
+    </script>
+</body>
+</html>
